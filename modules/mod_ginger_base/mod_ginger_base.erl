@@ -296,6 +296,14 @@ observe_search_query(#search_query{search={ginger_geo, _Args}}=Q, Context) ->
     ginger_geo_search:search_query(Q, Context);
 observe_search_query(#search_query{search={ginger_geo_nearby, _Args}}=Q, Context) ->
     ginger_geo_search:search_query(Q, Context);
+observe_search_query({search_query, {ginger_distinct_cities, []}, _OffsetLimit}, _Context) ->
+    % TODO query elasticsearch if available
+    #search_sql{
+        select="distinct pivot_city",
+        from="rsc",
+		where="pivot_city is not null",
+        order="pivot_city"
+    };
 observe_search_query(#search_query{}, _Context) ->
     undefined.
 
