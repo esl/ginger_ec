@@ -13,10 +13,13 @@ $.widget("ui.search_cmp_filters_period", {
         me.inputs = inputs;
         me.slider = widgetElement.find('.search__filters__slider');
         me.inputChanged = false;
-
+        me.min = me.widgetElement.data('min');
+        me.max = me.widgetElement.data('max');
+        
         inputs.on('keyup change', function () {
             //console.log('input changed');
             // Update slider when text inputs change
+            
             me.slider.slider('values', [$(me.inputs[0]).val(), $(me.inputs[1]).val()]);
 
             if (timer) {
@@ -36,8 +39,13 @@ $.widget("ui.search_cmp_filters_period", {
             slide: function (event, ui) {
                 $(me.inputs[0]).val(ui.values[0]).change();
                 $(me.inputs[1]).val(ui.values[1]).change();
-            }
-        });
+            },
+            min: me.min,
+            max: me.max,
+            values: [me.min, me.max]
+        });      
+         
+        
     },
 
     getValues: function() {
@@ -58,8 +66,14 @@ $.widget("ui.search_cmp_filters_period", {
            widgetValues = values[me.type];
         } catch(e) {}
 
-        $(this.inputs[0]).val(widgetValues.min);
-        $(this.inputs[1]).val(widgetValues.max);
+        if (widgetValues) {
+
+            $(this.inputs[0]).val(widgetValues.min);
+            $(this.inputs[1]).val(widgetValues.max);
+
+            me.slider.slider('values',0,widgetValues.min);
+            me.slider.slider('values',1,widgetValues.max);
+        }
     },
 
     getFacets: function(facets) {

@@ -21,7 +21,8 @@
     has_geo,
     is_findable,
     keyword,
-    ongoing_on_date
+    ongoing_on_date,
+    period
 ]).
 
 %% @doc Observe Zotonic search queries, transform arguments and forward to the
@@ -29,7 +30,9 @@
 -spec search_query(#search_query{}, #context{}) -> #search_sql{} | #search_result{} | undefined.
 search_query(#search_query{search = {ginger_search, Args}} = GingerQuery, Context) ->
     QueryArgs = query_arguments(Args, Context),
+    ?DEBUG(QueryArgs),
     ZotonicQuery = GingerQuery#search_query{search = {'query', QueryArgs}},
+    ?DEBUG(ZotonicQuery),
 
     %% Forward search query to the next observer. Make sure all custom Ginger
     %% search arguments have been removed.
@@ -252,6 +255,13 @@ parse_argument({ongoing_on_date, Date}) ->
     DayEndDT = z_datetime:next_day(DayStartDT),
     [{date_start_before, DayEndDT},
      {date_end_after, DayStartDT}];
+
+parse_argument({period, Period}) ->
+    ?DEBUG(Period),
+    DayStartDT = binary_to_list(proplists:get_value(<<"min">>, Period)) ++ "-01-01",
+    DayEndDT = binary_to_list(proplists:get_value(<<"max">>, Period)) ++ "-12-31",
+    [{date_start_after, DayStartDT},
+     {date_start_before, DayEndDT}];
 
 % Filtering on undefined is supported from Zotonic 0.13.16
 parse_argument({has_geo, true}) ->

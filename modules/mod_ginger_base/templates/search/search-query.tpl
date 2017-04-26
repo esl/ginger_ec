@@ -11,6 +11,7 @@
         date_end_after|default:q.date_end_after,
         date_start_before|default:q.date_start_before,
         date_end_before|default:q.date_end_before,
+        period|default:q.period,
         is_findable|default:"true",
         content_group|default:q.content_group,
         pagelen|default:10,
@@ -39,6 +40,7 @@
         date_end_after,
         date_start_before,
         date_end_before,
+        period,
         is_findable,
         content_group,
         pagelen,
@@ -72,6 +74,7 @@
             date_end_before=date_end_before
             date_start_after=date_start_after
             date_end_after=date_end_after
+            period=period
             is_findable=is_findable
             keyword=keyword
             anykeyword=anykeyword
