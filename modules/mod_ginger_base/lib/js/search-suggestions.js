@@ -86,6 +86,11 @@
                     me.searchInput.focus();
                 });
             }
+            else {
+                me.searchForm.on('transitionend', function () {
+                    me.searchInput.blur();
+                });
+            }
 
             $(document).trigger('search:toggled');
 
