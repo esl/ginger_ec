@@ -22,6 +22,7 @@
                         {% include "collection/share.tpl" record=record %}
                     {% endblock %}
                     {% include "collection/depiction.tpl" record=record template="collection/download.tpl" %}
+                    {% include "collection/link.tpl" record=record %}
                 </div>
             </div>
             <article class="adlib-object__description">

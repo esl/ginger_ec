@@ -139,3 +139,15 @@
 		}
 	}
 }
+
+.adlib-link {
+    @extend .adlib-download;
+
+    .adlib-action__btn {
+        &:before {
+            height: 15px;
+            width: 15px;
+            background: url('/lib/images/icon-link.svg');
+        }
+    }
+}
