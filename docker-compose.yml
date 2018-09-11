@@ -30,7 +30,7 @@ services:
             - 5601:5601
 
     zotonic:
-        image: driebit/ginger-dev:0.x
+        image: ginger-dev
         privileged: true
         links:
             - postgres

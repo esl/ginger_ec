@@ -18,6 +18,8 @@ content_types_provided(Req, State) ->
 
 to_json(Req, State) ->
     %% Init
+    ?DEBUG("Start profiling"),
+    fprof:trace([start]),
     Context  = z_context:new(Req, ?MODULE),
     RequestArgs = wrq:req_qs(Req),
     
@@ -25,7 +27,6 @@ to_json(Req, State) ->
     Type = list_to_atom(proplists:get_value("type", RequestArgs, "ginger_search")),
     Offset = list_to_integer(proplists:get_value("offset", RequestArgs, "0")),
     Limit = list_to_integer(proplists:get_value("limit", RequestArgs, "1000")),
-    
     case proplists:get_value(mode, State) of 
         coordinates ->
             %% We're only interested in the geolocation and id fields
@@ -109,7 +110,8 @@ is_visible(Document, _Context) when is_map(Document) ->
 -spec search_result(m_rsc:resource() | map(), z:context()) -> map().
 search_result(Id, Context) when is_integer(Id) ->
     Rsc = m_ginger_rest:rsc(Id, Context),
-    m_ginger_rest:with_edges(Rsc, [depiction], Context);
+    Result = m_ginger_rest:with_edges(Rsc, [depiction], Context),
+    Result;
 search_result(Document, _Context) when is_map(Document) ->
     %% Return a document (such as an Elasticsearch document) as is.
     Document.
