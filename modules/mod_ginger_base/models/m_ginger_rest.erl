@@ -18,7 +18,7 @@
 %% @doc Get REST resource properties.
 -spec rsc(m_rsc:resource(), z:context()) -> resource_properties().
 rsc(Id, Context) ->
-    #{
+    Rsc = #{
         <<"id">> => Id,
         <<"title">> => translations(Id, title, Context),
         <<"body">> => translations(Id, body, Context),
@@ -27,8 +27,8 @@ rsc(Id, Context) ->
         <<"publication_date">> => m_rsc:p(Id, publication_start, null, Context),
         <<"categories">> => proplists:get_value(is_a, m_rsc:p(Id, category, Context)),
         <<"properties">> => custom_props(Id, Context)
-    }.
-    %with_media(Rsc, Context).
+    },
+    with_media(Rsc, Context).
 
 %% @doc Add all edges to resource.
 -spec with_edges(map(), z:context()) -> map().
@@ -105,43 +105,43 @@ custom_props(Id, Context) ->
             end
     end.
 
-%-spec with_media(map(), z:context()) -> map().
-%with_media(Rsc, Context) ->
-%    with_media(Rsc, mediaclasses(Context), Context).
-%
-%-spec with_media(map(), [atom()], z:context()) -> map().
-%with_media(Rsc = #{<<"id">> := Id}, Mediaclasses, Context) ->
-%    case m_media:get(Id, Context) of
-%        undefined ->
-%            Rsc;
-%        _ ->
-%            Media = fun(Class, Acc) ->
-%                Opts = [{use_absolute_url, true}, {mediaclass, Class}],
-%                case z_media_tag:url(Id, Opts, Context) of
-%                    {ok, Url} ->
-%                        [#{mediaclass => Class, url => Url} | Acc];
-%                    _ ->
-%                        Acc
-%                end
-%                    end,
-%            Rsc#{<<"media">> => lists:foldr(Media, [], Mediaclasses)}
-%    end.
-%
-%%% @doc Get all mediaclasses for the site.
-%-spec mediaclasses(z:context()) -> [atom()].
-%mediaclasses(Context) ->
-%    Site = z_context:site(Context),
-%    Q = qlc:q([ R#mediaclass_index.key#mediaclass_index_key.mediaclass
-%                || R <- ets:table(?MEDIACLASS_INDEX),
-%                   R#mediaclass_index.key#mediaclass_index_key.site == Site
-%              ]
-%             ),
-%    lists:filter(
-%      fun
-%          (<<"admin-", _/bytes>>) ->
-%              false;
-%          (_) ->
-%              true
-%      end,
-%      lists:usort(qlc:eval(Q))
-%     ).
+-spec with_media(map(), z:context()) -> map().
+with_media(Rsc, Context) ->
+    with_media(Rsc, mediaclasses(Context), Context).
+
+-spec with_media(map(), [atom()], z:context()) -> map().
+with_media(Rsc = #{<<"id">> := Id}, Mediaclasses, Context) ->
+    case m_media:get(Id, Context) of
+        undefined ->
+            Rsc;
+        _ ->
+            Media = fun(Class, Acc) ->
+                Opts = [{use_absolute_url, true}, {mediaclass, Class}],
+                case z_media_tag:url(Id, Opts, Context) of
+                    {ok, Url} ->
+                        [#{mediaclass => Class, url => Url} | Acc];
+                    _ ->
+                        Acc
+                end
+                    end,
+            Rsc#{<<"media">> => lists:foldr(Media, [], Mediaclasses)}
+    end.
+
+%% @doc Get all mediaclasses for the site.
+-spec mediaclasses(z:context()) -> [atom()].
+mediaclasses(Context) ->
+    Site = z_context:site(Context),
+    Q = qlc:q([ R#mediaclass_index.key#mediaclass_index_key.mediaclass
+                || R <- ets:table(?MEDIACLASS_INDEX),
+                   R#mediaclass_index.key#mediaclass_index_key.site == Site
+              ]
+             ),
+    lists:filter(
+      fun
+          (<<"admin-", _/bytes>>) ->
+              false;
+          (_) ->
+              true
+      end,
+      lists:usort(qlc:eval(Q))
+     ).
