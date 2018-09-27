@@ -116,17 +116,18 @@ get_category_uri(Category, Context) ->
 
 -spec translations_to_rdf(m_rdf:predicate(), proplists:proplist(), z:context()) -> [m_rdf:triple()].
 translations_to_rdf(Predicate, Translations, Context) ->
-    lists:map(
-        fun({Language, Value}) ->
-            #triple{
+    maps:fold(
+        fun(Language, Value, Acc) ->
+            [#triple{
                 predicate = Predicate,
                 object = #rdf_value{
                     language = Language,
                     value = Value
                 }
-            }
+            }|Acc]
         end,
-        m_ginger_rest:translations(Translations, Context)
+      [],
+      m_ginger_rest:translations(Translations, Context)
     ).
 
 %% @doc Try to find media triples and add them to the set of triples.
